@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Arsam Ali, pipeline developer in Toronto. Python, Maya API and USD tools for VFX, with credits on House of the Dragon, Star Trek and The Boys.">
+<title>Arsam Ali | Pipeline Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: film-credits page. Condensed title-card type, credits laid out as camera slates, dark-first like a grading suite. */
+:root {
+  --bg: #11151b;
+  --surface: #181e26;
+  --line: #2a323d;
+  --fg: #e9e5dc;
+  --muted: #9aa3ad;
+  --accent: #e0a14a;
+  --accent-ink: #1a1308;
+  --display: "Barlow Condensed", "Arial Narrow", "Helvetica Neue", sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f3f1ec; --surface: #ffffff; --line: #d9d5cc; --fg: #171b21; --muted: #5d6570;
+    --accent: #a8641a; --accent-ink: #fff8ee; color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #f3f1ec; --surface: #ffffff; --line: #d9d5cc; --fg: #171b21; --muted: #5d6570;
+  --accent: #a8641a; --accent-ink: #fff8ee; color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 16px/1.6 var(--body); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 20px; }
+a { color: inherit; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+header.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 14px; flex-wrap: wrap; }
+.brand { font: 600 1.35rem/1 var(--display); letter-spacing: .06em; text-transform: uppercase; text-decoration: none; }
+nav { display: flex; gap: 22px; flex-wrap: wrap; }
+nav a { text-decoration: none; font: 500 .8rem/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+nav a:hover { color: var(--fg); }
+
+.hero { padding-block: 72px 56px; display: grid; gap: 28px; }
+.eyebrow { font: 500 .78rem/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+h1 { font: 700 clamp(3rem, 9vw, 6.4rem)/.92 var(--display); text-transform: uppercase; letter-spacing: .01em; margin: 0; text-wrap: balance; }
+h1 span { color: var(--muted); }
+.lede { max-width: 62ch; font-size: 1.12rem; color: var(--muted); margin: 0; }
+.lede strong { color: var(--fg); font-weight: 500; }
+.ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn { display: inline-block; padding: 12px 18px; font: 600 .82rem/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; text-decoration: none; border: 1px solid var(--line); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.facts { display: flex; flex-wrap: wrap; gap: 10px 28px; font: 400 .85rem/1.4 var(--mono); color: var(--muted); }
+.facts b { color: var(--fg); font-weight: 500; }
+
+section { padding-block: 56px; border-top: 1px solid var(--line); }
+h2 { font: 600 clamp(2rem, 5vw, 3rem)/1 var(--display); text-transform: uppercase; margin: 0 0 8px; letter-spacing: .02em; }
+.sub { color: var(--muted); max-width: 64ch; margin: 0 0 28px; }
+
+.filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px; }
+.filters button { font: 500 .78rem/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; padding: 9px 12px; background: transparent; color: var(--muted); border: 1px solid var(--line); cursor: pointer; }
+.filters button[aria-pressed="true"] { color: var(--accent-ink); background: var(--fg); border-color: var(--fg); }
+
+.slates { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; }
+.slate .art { aspect-ratio: 2 / 3; max-width: 100%; position: relative; overflow: hidden; background: var(--line); display: flex; align-items: flex-end; }
+.slate .art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.slate .art img.logo { object-fit: contain; padding: 18%; background: #e9e5dc; }
+.slate .art img.card { object-fit: contain; background: #0b0d10; }
+.slate .art .ph { position: absolute; inset: 0; background: radial-gradient(120% 80% at 30% 15%, hsl(var(--h) 45% 42%), transparent 60%), linear-gradient(160deg, hsl(var(--h) 35% 22%), hsl(calc(var(--h) + 40) 30% 9%)); }
+.slate .art .ph::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(255,255,255,.035) 0 1px, transparent 1px 3px); }
+.slate .art .ph-title { position: relative; padding: 14px; font: 700 1.7rem/.95 var(--display); text-transform: uppercase; color: #f3efe6; text-wrap: balance; text-shadow: 0 2px 12px rgba(0,0,0,.5); }
+.slate { background: var(--surface); border: 1px solid var(--line); display: grid; grid-template-rows: auto auto 1fr auto; min-width: 0; overflow: hidden; }
+.slate .bar { height: 10px; background: repeating-linear-gradient(-45deg, var(--fg) 0 10px, var(--surface) 10px 20px); opacity: .85; }
+.slate .title { padding: 12px 14px 10px; font: 600 1.2rem/1.05 var(--display); text-transform: uppercase; text-wrap: balance; }
+.slate dl { margin: 0; display: grid; grid-template-columns: auto auto 1fr; border-top: 1px solid var(--line); }
+.slate dl div { padding: 8px 10px; border-right: 1px solid var(--line); min-width: 0; }
+.slate dl div:last-child { border-right: 0; }
+.slate dt { font: 400 .62rem/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.slate dd { margin: 0; font: 500 .74rem/1.25 var(--mono); font-variant-numeric: tabular-nums; overflow-wrap: normal; }
+
+.cases { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+.case { border: 1px solid var(--line); padding: 22px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.case h3 { font: 600 1.5rem/1.05 var(--display); text-transform: uppercase; margin: 0; }
+.case p { margin: 0; color: var(--muted); }
+.case .row { display: grid; grid-template-columns: 76px 1fr; gap: 10px; font-size: .95rem; }
+.case .row span:first-child { font: 500 .7rem/1.9 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tags span { font: 400 .72rem/1 var(--mono); padding: 6px 8px; border: 1px solid var(--line); color: var(--muted); }
+.case a.more { font: 600 .78rem/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); text-decoration: none; }
+
+.timeline { display: grid; gap: 0; }
+.job { display: grid; grid-template-columns: 150px 1fr; gap: 20px; padding-block: 20px; border-bottom: 1px solid var(--line); }
+.job .when { font: 500 .85rem/1.5 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.job h3 { margin: 0; font: 600 1.35rem/1.1 var(--display); text-transform: uppercase; }
+.job p { margin: 6px 0 0; color: var(--muted); max-width: 70ch; }
+
+footer { padding-block: 48px 64px; border-top: 1px solid var(--line); display: grid; gap: 14px; }
+footer .big { font: 700 clamp(2rem, 6vw, 3.6rem)/1 var(--display); text-transform: uppercase; }
+footer small { color: var(--muted); font: 400 .75rem/1.5 var(--mono); }
+
+@media (max-width: 620px) {
+  .job { grid-template-columns: 1fr; gap: 6px; }
+  .hero { padding-block: 48px 40px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .slate { transition: transform .2s ease, border-color .2s ease; }
+  .slate:hover { transform: translateY(-3px); border-color: var(--accent); }
+}
+</style>
+</head>
+<body>
+
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top">Arsam Ali</a>
+    <nav aria-label="Main">
+      <a href="#credits">Credits</a>
+      <a href="#pipeline">Systems</a>
+      <a href="#code">Code</a>
+      <a href="#experience">Experience</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="wrap">
+    <div class="hero">
+      <div class="eyebrow">Pipeline Developer · Toronto</div>
+      <h1>Tools behind <span>the shots</span></h1>
+      <p class="lede">I build the Python, Maya and USD tooling that gets artists' work from scene to screen. Ten years in VFX and animation, most recently as <strong>Senior Pipeline Developer and Lead Support Developer at Pixomondo</strong> on House of the Dragon, Star Trek and The Boys.</p>
+      <div class="ctas">
+        <a class="btn primary" href="#credits">See credits</a>
+        <a class="btn" href="https://github.com/arsamasif">GitHub</a>
+        <a class="btn" href="#contact">Resume (PDF)</a>
+      </div>
+      <div class="facts">
+        <span><b>Python</b> · Maya API (OpenMaya 2.0)</span>
+        <span><b>USD</b> · Alembic</span>
+        <span><b>Rez</b> · Deadline · ShotGrid</span>
+        <span><b>PySide</b> · Pyblish</span>
+      </div>
+    </div>
+  </div>
+
+  <section id="credits">
+    <div class="wrap">
+      <h2>Credits</h2>
+      <p class="sub">Shows and films I supported as a pipeline developer at Pixomondo, 2022 to 2026.</p>
+      <div class="filters" role="group" aria-label="Filter credits">
+        <button type="button" id="f-all" data-f="all" aria-pressed="true">All</button>
+        <button type="button" id="f-tv" data-f="tv" aria-pressed="false">Series</button>
+        <button type="button" id="f-film" data-f="film" aria-pressed="false">Film</button>
+      </div>
+      <div class="slates" id="slates"></div>
+    </div>
+  </section>
+
+  <section id="pipeline">
+    <div class="wrap">
+      <h2>Pipeline systems</h2>
+      <p class="sub">Studio systems I developed over several years and dozens of releases, used daily across departments and sites. The code belongs to the studio, so these are written as case studies.</p>
+      <div class="cases">
+        <article class="case">
+          <h3>Asset representation system</h3>
+          <div class="row"><span>Problem</span><p>Heavy environments and crowds made layout, animation and lighting scenes slow to open and painful to swap.</p></div>
+          <div class="row"><span>Built</span><p>A custom Maya plug-in node and command set that holds every representation of an asset (proxy, render, GPU cache, Alembic, USD, renderer standins) and switches between them per department, with an asset manager UI and attribute editor templates.</p></div>
+          <div class="tags"><span>Maya API</span><span>USD</span><span>Alembic</span><span>PySide</span></div>
+        </article>
+        <article class="case">
+          <h3>Maya and USD scene I/O</h3>
+          <div class="row"><span>Problem</span><p>Assets, animation caches and shading moved between Maya, Houdini and the farm in different formats, and every handoff was rebuilt by hand.</p></div>
+          <div class="row"><span>Built</span><p>The studio's import/export layer: chunked Alembic and USD export with custom mayaUSD chasers, scene rebuilds from USD data, and a DCC-neutral library that generates per-asset and per-shot USD stages with references, payloads, variants and shading overrides.</p></div>
+          <div class="tags"><span>USD / Sdf</span><span>mayaUSD</span><span>OpenMaya</span><span>Alembic</span></div>
+        </article>
+        <article class="case">
+          <h3>Playblast and review pipeline</h3>
+          <div class="row"><span>Problem</span><p>Animators and layout artists spent time setting up cameras, overlays and color for every review, and results varied by artist.</p></div>
+          <div class="row"><span>Built</span><p>A playblast system with per-camera capture, HUD overlays, color-managed output and a queue of post actions: multiview comps through Nuke, encoding, publishing a Version to ShotGrid and opening it in RV for review.</p></div>
+          <div class="tags"><span>Maya</span><span>OCIO</span><span>ShotGrid</span><span>RV</span><span>Nuke</span></div>
+        </article>
+        <article class="case">
+          <h3>QC render and turntables</h3>
+          <div class="row"><span>Problem</span><p>Assets and caches were approved without being seen under real lighting, so problems surfaced late in shots.</p></div>
+          <div class="row"><span>Built</span><p>An automated QC render pipeline that assembles a scene from published caches and USD standins, sets up render layers for Arnold, V-Ray or Maya Software, submits to Deadline and publishes the results back to ShotGrid.</p></div>
+          <div class="tags"><span>Render Setup</span><span>Arnold</span><span>Deadline</span><span>ShotGrid</span></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="code">
+    <div class="wrap">
+      <h2>Open source</h2>
+      <p class="sub">Maya and USD tools I build and maintain in the open, tested and ready to drop into a studio pipeline.</p>
+      <div class="cases">
+        <article class="case"><h3>Scene Harvest</h3><p>Batch-extracts mesh, rig, material and dependency data from Maya and USD scenes into Parquet datasets, with checkpoint and resume.</p><div class="tags"><span>mayapy</span><span>pandas</span><span>USD</span></div><a class="more" href="https://github.com/arsamasif">View on GitHub</a></article>
+        <article class="case"><h3>Rep Switch</h3><p>Maya API 2.0 node and command for switching asset representations, with undo and a context resolver.</p><div class="tags"><span>OpenMaya 2.0</span><span>PySide</span></div><a class="more" href="https://github.com/arsamasif">View on GitHub</a></article>
+        <article class="case"><h3>Rig Kit</h3><p>Skin-weight proxy cutting, IK/FK matching, an mGear component and rig validation.</p><div class="tags"><span>Rigging</span><span>mGear</span></div><a class="more" href="https://github.com/arsamasif">View on GitHub</a></article>
+        <article class="case"><h3>Asset Gate</h3><p>Validate-then-publish checks for Maya assets, ending in a USD asset with LOD variants and materials.</p><div class="tags"><span>USD</span><span>Validation</span></div><a class="more" href="https://github.com/arsamasif">View on GitHub</a></article>
+      </div>
+    </div>
+  </section>
+
+  <section id="experience">
+    <div class="wrap">
+      <h2>Experience</h2>
+      <div class="timeline">
+        <div class="job"><div class="when">2022 – 2026</div><div><h3>Pixomondo</h3><p>Lead Support Developer and Senior Pipeline Developer. Maya and USD asset pipeline, publish and validation, render farm automation, and leading pipeline support.</p></div></div>
+        <div class="job"><div class="when">2019 – 2022</div><div><h3>Snowball Studios</h3><p>CG Supervisor and Pipeline Developer.</p></div></div>
+        <div class="job"><div class="when">2016 – 2018</div><div><h3>Keyframe Digital</h3><p>Pipeline Developer and Rigging TD.</p></div></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer id="contact">
+  <div class="wrap" style="display:grid;gap:14px">
+    <div class="big">Let's talk pipeline</div>
+    <div class="ctas">
+      <a class="btn primary" href="https://www.linkedin.com/">LinkedIn</a>
+      <a class="btn" href="https://github.com/arsamasif">GitHub</a>
+    </div>
+    <small>Show titles are the property of their studios. Credits reflect work on Pixomondo's VFX for each title.</small>
+  </div>
+</footer>
+
+<script>
+const CREDITS = [
+  ["House of the Dragon", "S3", 2026, "tv", "HBO"],
+  ["House of the Dragon", "S2", 2024, "tv", "HBO"],
+  ["House of the Dragon", "S1", 2022, "tv", "HBO"],
+  ["Star Trek: Strange New Worlds", "", 2022, "tv", "Paramount+"],
+  ["Star Trek: Discovery", "", 2024, "tv", "Paramount+"],
+  ["The Boys", "", 2024, "tv", "Prime Video"],
+  ["The Umbrella Academy", "", 2024, "tv", "Netflix"],
+  ["Halo", "", 2022, "tv", "Paramount+"],
+  ["Love & Death", "", 2023, "tv", "Max"],
+  ["Winning Time", "", 2022, "tv", "HBO"],
+  ["Carnival Row", "S2", 2023, "tv", "Prime Video"],
+  ["Perry Mason", "S2", 2023, "tv", "HBO"],
+  ["Upload", "", 2022, "tv", "Prime Video"],
+  ["John Wick: Chapter 4", "", 2023, "film", "Lionsgate"],
+  ["Ant-Man and the Wasp: Quantumania", "", 2023, "film", "Marvel"],
+  ["Gran Turismo", "", 2023, "film", "Sony"],
+  ["Ghosted", "", 2023, "film", "Apple TV+"],
+  ["The Pale Blue Eye", "", 2023, "film", "Netflix"],
+  ["Damsel", "", 2024, "film", "Netflix"],
+  ["Borderlands", "", 2024, "film", "Lionsgate"]
+];
+const box = document.getElementById("slates");
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
+const IMAGES = {
+"House of the Dragon S3": "img/hotd-s3.jpg",
+"House of the Dragon S2": "img/hotd-s2.png",
+"House of the Dragon S1": "img/hotd-s1.png",
+"Star Trek: Strange New Worlds": "img/star-trek-snw.png",
+"Star Trek: Discovery": "img/star-trek-discovery.png",
+"The Boys": "img/the-boys.png",
+"The Umbrella Academy": "img/umbrella-academy.png",
+"Halo": "img/halo.png",
+"Love & Death": "img/love-and-death.png",
+"Winning Time": "img/winning-time.jpg",
+"Carnival Row S2": "img/carnival-row.png",
+"Perry Mason S2": "img/perry-mason.jpg",
+"Upload": "img/upload.jpeg",
+"John Wick: Chapter 4": "img/john-wick-4.jpg",
+"Ant-Man and the Wasp: Quantumania": "img/ant-man-quantumania.jpg",
+"Gran Turismo": "img/gran-turismo.jpeg",
+"Ghosted": "img/ghosted.png",
+"The Pale Blue Eye": "img/the-pale-blue-eye.jpg",
+"Damsel": "img/damsel.jpg",
+"Borderlands": "img/borderlands.jpg"
+};
+const LOGOS = new Set(["Halo", "Star Trek: Discovery", "Star Trek: Strange New Worlds", "The Boys", "The Umbrella Academy"]);
+const TITLECARDS = new Set(["Carnival Row S2", "Upload", "Winning Time"]);
+function art(c) {
+  const key = c[0] + (c[1] ? " " + c[1] : "");
+  if (IMAGES[key]) {
+    const cls = LOGOS.has(key) ? "logo" : TITLECARDS.has(key) ? "card" : "";
+    return `<img class="${cls}" src="${IMAGES[key]}" alt="${esc(key)} key art" loading="lazy">`;
+  }
+  let h = 0; for (const ch of key) h = (h * 31 + ch.charCodeAt(0)) % 360;
+  return `<div class="ph" style="--h:${h}"></div><div class="ph-title">${esc(c[0])}</div>`;
+}
+function render(f) {
+  box.innerHTML = CREDITS.filter(c => f === "all" || c[3] === f).map(c =>
+    `<article class="slate"><div class="art">${art(c)}</div><div class="bar"></div><div class="title">${esc(c[0])}${c[1] ? " · " + esc(c[1]) : ""}</div>
+     <dl><div><dt>Year</dt><dd>${c[2]}</dd></div><div><dt>Type</dt><dd>${c[3] === "tv" ? "Series" : "Film"}</dd></div><div><dt>For</dt><dd>${esc(c[4])}</dd></div></dl></article>`
+  ).join("");
+}
+document.querySelectorAll(".filters button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll(".filters button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  render(b.dataset.f);
+}));
+render("all");
+</script>
+
+</body>
+</html>
