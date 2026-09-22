@@ -73,6 +73,7 @@ h2 { font: 600 clamp(2rem, 5vw, 3rem)/1 var(--display); text-transform: uppercas
 .slate .art .ph { position: absolute; inset: 0; background: radial-gradient(120% 80% at 30% 15%, hsl(var(--h) 45% 42%), transparent 60%), linear-gradient(160deg, hsl(var(--h) 35% 22%), hsl(calc(var(--h) + 40) 30% 9%)); }
 .slate .art .ph::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(255,255,255,.035) 0 1px, transparent 1px 3px); }
 .slate .art .ph-title { position: relative; padding: 14px; font: 700 1.7rem/.95 var(--display); text-transform: uppercase; color: #f3efe6; text-wrap: balance; text-shadow: 0 2px 12px rgba(0,0,0,.5); }
+a.slate { text-decoration: none; color: inherit; }
 .slate { background: var(--surface); border: 1px solid var(--line); display: grid; grid-template-rows: auto auto 1fr auto; min-width: 0; overflow: hidden; }
 .slate .bar { height: 10px; background: repeating-linear-gradient(-45deg, var(--fg) 0 10px, var(--surface) 10px 20px); opacity: .85; }
 .slate .title { padding: 12px 14px 10px; font: 600 1.2rem/1.05 var(--display); text-transform: uppercase; text-wrap: balance; }
@@ -253,6 +254,12 @@ const CREDITS = [
   ["Damsel", "", 2024, "film", "Netflix"],
   ["Borderlands", "", 2024, "film", "Lionsgate"]
 ];
+const IMDB = {"House of the Dragon": "tt11198330", "Star Trek: Strange New Worlds": "tt12327578", "Star Trek: Discovery": "tt5171438", "The Boys": "tt1190634", "The Umbrella Academy": "tt1312171", "Halo": "tt2934286", "Love & Death": "tt14586350", "Winning Time": "tt10244600", "Carnival Row": "tt0489974", "Perry Mason": "tt2077823", "Upload": "tt7826376", "John Wick: Chapter 4": "tt10366206", "Ant-Man and the Wasp: Quantumania": "tt10954600", "Gran Turismo": "tt4495098", "Ghosted": "tt15326988", "The Pale Blue Eye": "tt14138650", "Damsel": "tt13452446", "Borderlands": "tt4978420"};
+function imdbUrl(c) {
+  const base = "https://www.imdb.com/title/" + IMDB[c[0]] + "/";
+  const season = /^S(\d+)$/.exec(c[1]);
+  return season ? base + "episodes/?season=" + season[1] : base;
+}
 const box = document.getElementById("slates");
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
 const IMAGES = {
@@ -290,8 +297,8 @@ function art(c) {
 }
 function render(f) {
   box.innerHTML = CREDITS.filter(c => f === "all" || c[3] === f).map(c =>
-    `<article class="slate"><div class="art">${art(c)}</div><div class="bar"></div><div class="title">${esc(c[0])}${c[1] ? " · " + esc(c[1]) : ""}</div>
-     <dl><div><dt>Year</dt><dd>${c[2]}</dd></div><div><dt>Type</dt><dd>${c[3] === "tv" ? "Series" : "Film"}</dd></div><div><dt>For</dt><dd>${esc(c[4])}</dd></div></dl></article>`
+    `<a class="slate" href="${imdbUrl(c)}" target="_blank" rel="noopener" aria-label="${esc(c[0])}${c[1] ? " " + esc(c[1]) : ""} on IMDb"><div class="art">${art(c)}</div><div class="bar"></div><div class="title">${esc(c[0])}${c[1] ? " · " + esc(c[1]) : ""}</div>
+     <dl><div><dt>Year</dt><dd>${c[2]}</dd></div><div><dt>Type</dt><dd>${c[3] === "tv" ? "Series" : "Film"}</dd></div><div><dt>For</dt><dd>${esc(c[4])}</dd></div></dl></a>`
   ).join("");
 }
 document.querySelectorAll(".filters button").forEach(b => b.addEventListener("click", () => {
