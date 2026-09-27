@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maya and USD scene I/O | Arsam Ali</title>
+<meta name="description" content="The import and export layer between Maya, USD and the rest of the studio pipeline.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg: #11151b; --surface: #181e26; --line: #2a323d; --fg: #e9e5dc; --muted: #9aa3ad;
+  --accent: #e0a14a; --accent-ink: #1a1308;
+  --display: "Barlow Condensed", "Arial Narrow", "Helvetica Neue", sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f3f1ec; --surface: #ffffff; --line: #d9d5cc; --fg: #171b21; --muted: #5d6570;
+    --accent: #a8641a; --accent-ink: #fff8ee; color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #f3f1ec; --surface: #ffffff; --line: #d9d5cc; --fg: #171b21; --muted: #5d6570;
+  --accent: #a8641a; --accent-ink: #fff8ee; color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 var(--body); }
+.wrap { max-width: 960px; margin: 0 auto; padding-inline: 20px; }
+a { color: inherit; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+header.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+header.top .wrap { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-block: 16px; }
+.brand { font: 600 1.35rem/1 var(--display); letter-spacing: .06em; text-transform: uppercase; text-decoration: none; }
+.back { text-decoration: none; font: 500 .8rem/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.back:hover { color: var(--fg); }
+.hero { padding-block: 56px 36px; display: grid; gap: 16px; }
+.eyebrow { font: 500 .78rem/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+h1 { font: 700 clamp(2.6rem, 7vw, 4.8rem)/.95 var(--display); text-transform: uppercase; margin: 0; text-wrap: balance; }
+.lede { max-width: 66ch; font-size: 1.12rem; color: var(--muted); margin: 0; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tags span { font: 400 .72rem/1 var(--mono); padding: 6px 8px; border: 1px solid var(--line); color: var(--muted); }
+section { padding-block: 40px; border-top: 1px solid var(--line); }
+h2 { font: 600 clamp(1.7rem, 4vw, 2.4rem)/1 var(--display); text-transform: uppercase; margin: 0 0 18px; letter-spacing: .02em; }
+p { max-width: 70ch; }
+.flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; }
+.flow .step { flex: 1 1 150px; border: 1px solid var(--line); background: var(--surface); padding: 14px; min-width: 0; }
+.flow .step b { display: block; font: 600 1.1rem/1.1 var(--display); text-transform: uppercase; margin-bottom: 6px; }
+.flow .step small { color: var(--muted); font-size: .85rem; line-height: 1.45; display: block; }
+.flow .arrow { align-self: center; color: var(--accent); font: 500 1rem/1 var(--mono); }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.item { border: 1px solid var(--line); padding: 18px; min-width: 0; }
+.item h3 { font: 600 1.25rem/1.1 var(--display); text-transform: uppercase; margin: 0 0 10px; }
+.item ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: .95rem; }
+.item li + li { margin-top: 6px; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+.facts div { border-left: 2px solid var(--accent); padding-left: 12px; }
+.facts b { display: block; font: 600 1.6rem/1.1 var(--display); text-transform: uppercase; }
+.facts span { color: var(--muted); font-size: .9rem; }
+.note { color: var(--muted); font-size: .9rem; }
+nav.next { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding-block: 32px 64px; border-top: 1px solid var(--line); }
+nav.next a { text-decoration: none; font: 600 .82rem/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+@media (max-width: 620px) { .flow .arrow { display: none; } .flow .step { flex-basis: 100%; } }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../index.html">Arsam Ali</a>
+  <a class="back" href="../index.html#pipeline">&larr; All systems</a>
+</div></header>
+<main class="wrap">
+<div class="hero">
+  <div class="eyebrow">Python &middot; USD / Sdf &middot; mayaUSD</div>
+  <h1>Maya and USD scene I/O</h1>
+  <p class="lede">Every asset, cache and shot passed through this layer on its way in or out of Maya. It turned what used to be hand-built handoffs into a single library that could write and read the studio's formats, build USD stages for assets and shots, and rebuild a Maya scene from them.</p>
+  <div class="tags"><span>USD / Sdf / Usd</span><span>mayaUSD</span><span>OpenMaya</span><span>Alembic</span><span>FBX</span><span>Arnold</span><span>Rez</span><span>PySide</span></div>
+</div>
+<section>
+  <h2>How it fits together</h2>
+  <div class="flow"><div class="step"><b>Maya scene</b><small>Assets, animation, cameras and shading</small></div>
+    <span class="arrow" aria-hidden="true">&rarr;</span>
+    <div class="step"><b>Export layer</b><small>DCC-neutral interface with a Maya adapter</small></div>
+    <span class="arrow" aria-hidden="true">&rarr;</span>
+    <div class="step"><b>USD stages</b><small>Per asset, per shot and a global stage</small></div>
+    <span class="arrow" aria-hidden="true">&rarr;</span>
+    <div class="step"><b>Downstream</b><small>Other DCCs, lighting, the render farm</small></div></div>
+</section>
+<section>
+  <h2>What I built</h2>
+  <div class="grid">
+    <div class="item"><h3>Export</h3><ul><li>One interface for writing Maya ASCII and binary, Alembic, USD, FBX, OBJ, renderer scene files and GPU caches.</li><li>Chunked, parallel Alembic export that splits long frame ranges across background processes, with a command-line entry point for the farm.</li><li>Custom mayaUSD export hooks registered through a small plug-in registry, used to add studio metadata and render settings.</li><li>Subdivision and render settings carried through so lighting received what animation approved.</li></ul></div>
+    <div class="item"><h3>USD generation</h3><ul><li>Asset and shot stages assembled from published work with references, payloads and variant sets.</li><li>Shot stages that are generated once and then updated in place as departments publish new versions.</li><li>Shading overrides patched into USD so look development carried across to other packages.</li></ul></div>
+    <div class="item"><h3>Import and rebuild</h3><ul><li>A set loader that decides per piece whether to reference or payload it.</li><li>Rebuilding Maya hierarchies, transforms and animation keys from USD data.</li><li>Point instancers and Maya instancing networks translated in both directions.</li></ul></div>
+    <div class="item"><h3>Breakdown and tools</h3><ul><li>A scene breakdown that finds outdated assets and caches and updates them in place.</li><li>Variant switching from the UI without leaving Maya.</li><li>A dockable USD widget kept in sync with the Maya selection.</li></ul></div>
+  </div>
+</section>
+<section>
+  <h2>Scale</h2>
+  <div class="facts"><div><b>Two libraries</b><span>a Maya layer on top of a DCC-neutral USD core</span></div><div><b>Many USD versions</b><span>built and tested as separate package variants</span></div><div><b>Windows and Linux</b><span>packaged per platform for artists and the farm</span></div><div><b>Dozens of releases</b><span>test-covered through each one</span></div></div>
+  <p class="note">This was studio work, so the code stays with the studio. This page describes what the system did, not how it was written.</p>
+</section>
+<nav class="next" aria-label="More systems"><a href="asset-representation.html">&larr; Asset representation system</a><a href="playblast-review.html">Playblast and review pipeline &rarr;</a></nav>
+</main>
+</body>
+</html>

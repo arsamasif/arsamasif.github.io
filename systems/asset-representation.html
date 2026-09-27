@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Asset representation system | Arsam Ali</title>
+<meta name="description" content="A Maya plug-in node and toolset that holds every representation of an asset and switches between them per department.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg: #11151b; --surface: #181e26; --line: #2a323d; --fg: #e9e5dc; --muted: #9aa3ad;
+  --accent: #e0a14a; --accent-ink: #1a1308;
+  --display: "Barlow Condensed", "Arial Narrow", "Helvetica Neue", sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f3f1ec; --surface: #ffffff; --line: #d9d5cc; --fg: #171b21; --muted: #5d6570;
+    --accent: #a8641a; --accent-ink: #fff8ee; color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #f3f1ec; --surface: #ffffff; --line: #d9d5cc; --fg: #171b21; --muted: #5d6570;
+  --accent: #a8641a; --accent-ink: #fff8ee; color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 var(--body); }
+.wrap { max-width: 960px; margin: 0 auto; padding-inline: 20px; }
+a { color: inherit; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+header.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+header.top .wrap { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-block: 16px; }
+.brand { font: 600 1.35rem/1 var(--display); letter-spacing: .06em; text-transform: uppercase; text-decoration: none; }
+.back { text-decoration: none; font: 500 .8rem/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.back:hover { color: var(--fg); }
+.hero { padding-block: 56px 36px; display: grid; gap: 16px; }
+.eyebrow { font: 500 .78rem/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+h1 { font: 700 clamp(2.6rem, 7vw, 4.8rem)/.95 var(--display); text-transform: uppercase; margin: 0; text-wrap: balance; }
+.lede { max-width: 66ch; font-size: 1.12rem; color: var(--muted); margin: 0; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tags span { font: 400 .72rem/1 var(--mono); padding: 6px 8px; border: 1px solid var(--line); color: var(--muted); }
+section { padding-block: 40px; border-top: 1px solid var(--line); }
+h2 { font: 600 clamp(1.7rem, 4vw, 2.4rem)/1 var(--display); text-transform: uppercase; margin: 0 0 18px; letter-spacing: .02em; }
+p { max-width: 70ch; }
+.flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; }
+.flow .step { flex: 1 1 150px; border: 1px solid var(--line); background: var(--surface); padding: 14px; min-width: 0; }
+.flow .step b { display: block; font: 600 1.1rem/1.1 var(--display); text-transform: uppercase; margin-bottom: 6px; }
+.flow .step small { color: var(--muted); font-size: .85rem; line-height: 1.45; display: block; }
+.flow .arrow { align-self: center; color: var(--accent); font: 500 1rem/1 var(--mono); }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.item { border: 1px solid var(--line); padding: 18px; min-width: 0; }
+.item h3 { font: 600 1.25rem/1.1 var(--display); text-transform: uppercase; margin: 0 0 10px; }
+.item ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: .95rem; }
+.item li + li { margin-top: 6px; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+.facts div { border-left: 2px solid var(--accent); padding-left: 12px; }
+.facts b { display: block; font: 600 1.6rem/1.1 var(--display); text-transform: uppercase; }
+.facts span { color: var(--muted); font-size: .9rem; }
+.note { color: var(--muted); font-size: .9rem; }
+nav.next { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding-block: 32px 64px; border-top: 1px solid var(--line); }
+nav.next a { text-decoration: none; font: 600 .82rem/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+@media (max-width: 620px) { .flow .arrow { display: none; } .flow .step { flex-basis: 100%; } }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../index.html">Arsam Ali</a>
+  <a class="back" href="../index.html#pipeline">&larr; All systems</a>
+</div></header>
+<main class="wrap">
+<div class="hero">
+  <div class="eyebrow">Maya plug-in &middot; Python &middot; C-level API</div>
+  <h1>Asset representation system</h1>
+  <p class="lede">Environments, set dressing and crowds can carry thousands of assets. This system gave each of them a single lightweight node in Maya that knows every version of itself, from a bounding box to the full render asset, so artists could open heavy scenes quickly and swap detail only where they needed it.</p>
+  <div class="tags"><span>Maya API 2.0</span><span>OpenMaya</span><span>USD</span><span>Alembic</span><span>GPU cache</span><span>Arnold</span><span>PySide / Qt</span><span>MEL</span></div>
+</div>
+<section>
+  <h2>How it fits together</h2>
+  <div class="flow"><div class="step"><b>Published asset</b><small>Geometry, caches and USD from the asset library</small></div>
+    <span class="arrow" aria-hidden="true">&rarr;</span>
+    <div class="step"><b>Asset node</b><small>One custom transform per asset that stores every representation</small></div>
+    <span class="arrow" aria-hidden="true">&rarr;</span>
+    <div class="step"><b>Switch</b><small>Per department or per selection, with undo</small></div>
+    <span class="arrow" aria-hidden="true">&rarr;</span>
+    <div class="step"><b>Viewport and render</b><small>Light proxies for layout, full detail at render time</small></div></div>
+</section>
+<section>
+  <h2>What I built</h2>
+  <div class="grid">
+    <div class="item"><h3>Custom node and commands</h3><ul><li>A custom transform node type with its own attributes for asset identity, active representation and display state.</li><li>A companion manager node that tracks every asset in the scene.</li><li>Undoable commands for creating nodes from the library, from USD and from scene description files.</li><li>An edit mode that lets artists open up an asset, change it, and fold it back into its proxy.</li></ul></div>
+    <div class="item"><h3>Representations</h3><ul><li>Bounding box, GPU cache, Alembic, USD stage, renderer standin and volume representations behind one interface.</li><li>File translator plug-ins so assets could be brought in through standard Maya import.</li><li>Shared edits that carry over when a representation is switched or updated to a newer version.</li></ul></div>
+    <div class="item"><h3>Scene integrity</h3><ul><li>A callback layer and registry that keeps nodes valid on open, save, reference and delete.</li><li>Namespace repair and transform locking so set dressing could not be broken by accident.</li><li>Transform changes pushed through to USD so the Maya and USD views of a set stay in sync.</li><li>Update and diff tools that show what changed before an asset is swapped to a new version.</li></ul></div>
+    <div class="item"><h3>Artist tools</h3><ul><li>A Qt asset manager built model-view, with filtering, category icons and bulk switching.</li><li>Attribute editor templates and data-driven menus so the node felt native to Maya.</li><li>Render-time attributes passed through to the renderer for per-asset shading variation.</li></ul></div>
+  </div>
+</section>
+<section>
+  <h2>Scale</h2>
+  <div class="facts"><div><b>Several years</b><span>of active development and dozens of releases</span></div><div><b>5 Maya versions</b><span>supported side by side</span></div><div><b>Unit tested</b><span>core logic tested outside the Maya UI</span></div><div><b>Every department</b><span>layout, set dressing, animation and lighting</span></div></div>
+  <p class="note">This was studio work, so the code stays with the studio. This page describes what the system did, not how it was written.</p>
+</section>
+<nav class="next" aria-label="More systems"><a href="qc-render.html">&larr; QC render and turntables</a><a href="scene-io-usd.html">Maya and USD scene I/O &rarr;</a></nav>
+</main>
+</body>
+</html>

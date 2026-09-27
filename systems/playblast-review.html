@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Playblast and review pipeline | Arsam Ali</title>
+<meta name="description" content="A playblast tool and post-processing queue that takes a Maya shot from capture to a review-ready Version.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg: #11151b; --surface: #181e26; --line: #2a323d; --fg: #e9e5dc; --muted: #9aa3ad;
+  --accent: #e0a14a; --accent-ink: #1a1308;
+  --display: "Barlow Condensed", "Arial Narrow", "Helvetica Neue", sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f3f1ec; --surface: #ffffff; --line: #d9d5cc; --fg: #171b21; --muted: #5d6570;
+    --accent: #a8641a; --accent-ink: #fff8ee; color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #f3f1ec; --surface: #ffffff; --line: #d9d5cc; --fg: #171b21; --muted: #5d6570;
+  --accent: #a8641a; --accent-ink: #fff8ee; color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 var(--body); }
+.wrap { max-width: 960px; margin: 0 auto; padding-inline: 20px; }
+a { color: inherit; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+header.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+header.top .wrap { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-block: 16px; }
+.brand { font: 600 1.35rem/1 var(--display); letter-spacing: .06em; text-transform: uppercase; text-decoration: none; }
+.back { text-decoration: none; font: 500 .8rem/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.back:hover { color: var(--fg); }
+.hero { padding-block: 56px 36px; display: grid; gap: 16px; }
+.eyebrow { font: 500 .78rem/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+h1 { font: 700 clamp(2.6rem, 7vw, 4.8rem)/.95 var(--display); text-transform: uppercase; margin: 0; text-wrap: balance; }
+.lede { max-width: 66ch; font-size: 1.12rem; color: var(--muted); margin: 0; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tags span { font: 400 .72rem/1 var(--mono); padding: 6px 8px; border: 1px solid var(--line); color: var(--muted); }
+section { padding-block: 40px; border-top: 1px solid var(--line); }
+h2 { font: 600 clamp(1.7rem, 4vw, 2.4rem)/1 var(--display); text-transform: uppercase; margin: 0 0 18px; letter-spacing: .02em; }
+p { max-width: 70ch; }
+.flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; }
+.flow .step { flex: 1 1 150px; border: 1px solid var(--line); background: var(--surface); padding: 14px; min-width: 0; }
+.flow .step b { display: block; font: 600 1.1rem/1.1 var(--display); text-transform: uppercase; margin-bottom: 6px; }
+.flow .step small { color: var(--muted); font-size: .85rem; line-height: 1.45; display: block; }
+.flow .arrow { align-self: center; color: var(--accent); font: 500 1rem/1 var(--mono); }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.item { border: 1px solid var(--line); padding: 18px; min-width: 0; }
+.item h3 { font: 600 1.25rem/1.1 var(--display); text-transform: uppercase; margin: 0 0 10px; }
+.item ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: .95rem; }
+.item li + li { margin-top: 6px; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+.facts div { border-left: 2px solid var(--accent); padding-left: 12px; }
+.facts b { display: block; font: 600 1.6rem/1.1 var(--display); text-transform: uppercase; }
+.facts span { color: var(--muted); font-size: .9rem; }
+.note { color: var(--muted); font-size: .9rem; }
+nav.next { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding-block: 32px 64px; border-top: 1px solid var(--line); }
+nav.next a { text-decoration: none; font: 600 .82rem/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+@media (max-width: 620px) { .flow .arrow { display: none; } .flow .step { flex-basis: 100%; } }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../index.html">Arsam Ali</a>
+  <a class="back" href="../index.html#pipeline">&larr; All systems</a>
+</div></header>
+<main class="wrap">
+<div class="hero">
+  <div class="eyebrow">Python &middot; Pyblish &middot; ShotGrid</div>
+  <h1>Playblast and review pipeline</h1>
+  <p class="lede">Dailies depend on playblasts looking the same from every artist. This system made capture consistent and automatic: the right cameras, overlays, colour and resolution every time, followed by a queue of steps that encoded, published and opened the result for review without anyone touching it.</p>
+  <div class="tags"><span>Maya</span><span>Pyblish</span><span>OCIO</span><span>ffmpeg</span><span>ShotGrid</span><span>RV</span><span>Nuke</span><span>YAML</span></div>
+</div>
+<section>
+  <h2>How it fits together</h2>
+  <div class="flow"><div class="step"><b>Collect</b><small>Shot, cameras, frame range and settings</small></div>
+    <span class="arrow" aria-hidden="true">&rarr;</span>
+    <div class="step"><b>Validate</b><small>Checks with one-click fixes</small></div>
+    <span class="arrow" aria-hidden="true">&rarr;</span>
+    <div class="step"><b>Capture</b><small>Per camera, witness cams or full sequence</small></div>
+    <span class="arrow" aria-hidden="true">&rarr;</span>
+    <div class="step"><b>Post actions</b><small>Encode, comp, publish and push to review</small></div></div>
+</section>
+<section>
+  <h2>What I built</h2>
+  <div class="grid">
+    <div class="item"><h3>Capture</h3><ul><li>Per-camera, witness camera and full sequence playblasts from one tool.</li><li>HUD overlays with shot, frame, focal length and artist details.</li><li>Colour-managed output and a resolution resolver that follows project and shot settings.</li><li>A headless mode so the same capture could run on the farm without a UI.</li></ul></div>
+    <div class="item"><h3>Publish framework</h3><ul><li>Around two dozen collect, validate, extract and integrate plug-ins.</li><li>Validators with fix and select actions so artists could resolve problems in place.</li><li>A metadata sidecar written next to every capture for tracking and later tools.</li></ul></div>
+    <div class="item"><h3>Post action queue</h3><ul><li>A configurable queue of steps driven by YAML, so shows could add or remove steps without code.</li><li>Steps for encoding, frame counters, metadata burn-in, managed storage and registration.</li><li>Multiview and stereo comps rendered through a Nuke template.</li><li>Versions created in ShotGrid with status updates, then opened in RV.</li></ul></div>
+    <div class="item"><h3>Artist experience</h3><ul><li>A tool UI that remembers each artist's settings between sessions.</li><li>Clear progress and error reporting, so a failed step pointed at the cause.</li></ul></div>
+  </div>
+</section>
+<section>
+  <h2>Scale</h2>
+  <div class="facts"><div><b>~14 post actions</b><span>configurable per show</span></div><div><b>~25 publish plug-ins</b><span>collect, validate, extract, integrate</span></div><div><b>Headless</b><span>same pipeline in the UI and on the farm</span></div><div><b>Many releases</b><span>with a dedicated test suite</span></div></div>
+  <p class="note">This was studio work, so the code stays with the studio. This page describes what the system did, not how it was written.</p>
+</section>
+<nav class="next" aria-label="More systems"><a href="scene-io-usd.html">&larr; Maya and USD scene I/O</a><a href="qc-render.html">QC render and turntables &rarr;</a></nav>
+</main>
+</body>
+</html>
