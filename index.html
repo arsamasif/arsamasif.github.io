@@ -56,6 +56,8 @@ h1 span { color: var(--muted); }
 .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .btn { transition: background-color .15s ease, color .15s ease, border-color .15s ease; }
 .btn:hover, .btn:focus-visible { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.ctas:has(.btn:not(.primary):hover) .btn.primary:not(:hover),
+.ctas:has(.btn:not(.primary):focus-visible) .btn.primary:not(:focus-visible) { background: transparent; color: inherit; border-color: var(--line); }
 .facts { display: flex; flex-wrap: wrap; gap: 10px 28px; font: 400 .85rem/1.4 var(--mono); color: var(--muted); }
 .facts b { color: var(--fg); font-weight: 500; }
 
