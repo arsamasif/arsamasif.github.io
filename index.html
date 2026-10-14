@@ -116,6 +116,19 @@ footer small { color: var(--muted); font: 400 .75rem/1.5 var(--mono); }
   a.case { transition: transform .2s ease, border-color .2s ease; }
   a.case:hover { transform: translateY(-3px); border-color: var(--accent); }
 }
+@media print {
+  :root:not([data-theme="dark"]), :root[data-theme="dark"] {
+    --bg: #fff; --surface: #fff; --line: #c9c5bd; --fg: #111; --muted: #444;
+    --accent: #6b3d0c; --accent-ink: #111; color-scheme: light;
+  }
+  header.top { position: static; background: none; backdrop-filter: none; }
+  nav, .filters, .hero .ctas { display: none; }
+  .hero { padding-block: 24px; }
+  section { padding-block: 28px; }
+  .slate, .case, .job { break-inside: avoid; }
+  .btn, .btn.primary { background: none; color: var(--fg); border-color: var(--line); }
+  #code a.more::after, footer a.btn::after { content: " " attr(href); font-weight: 400; text-transform: none; letter-spacing: 0; overflow-wrap: anywhere; }
+}
 </style>
 </head>
 <body>
